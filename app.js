@@ -34,6 +34,7 @@ client.on("message", msg => {
 
 client.on('ready', () => {
     const channel = client.channels.cache.find(channel => channel.name === 'bot-lab')
+    channel.send('Lorem ipsum')
     console.log(channel.name)
 })
 
