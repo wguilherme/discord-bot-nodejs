@@ -29,6 +29,15 @@ client.on("message", msg => {
 });
 
 
+
+
+
+client.on('ready', () => {
+    const channel = client.channels.cache.find(channel => channel.name === 'bot-lab')
+    console.log(channel.name)
+})
+
+
 client.on('ready', () => {
 client.channels.fetch('806175198763417651')
   .then(channel => console.log(channel.name))
