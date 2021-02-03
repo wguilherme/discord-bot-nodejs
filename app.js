@@ -16,13 +16,31 @@ client.on('message', message => {
     }
   });
 
+// client.on('message', message => {  
+//     message.channel.send('pong');
+//   });
+
 
 client.on("message", msg => {
 
-    if (msg.content === "!hello") {
-        msg.reply("Hello world!");
+    if (msg.content === "!ping") {
+        msg.reply("pong!");
     }
 });
+
+
+client.on('ready', () => {
+client.channels.fetch('806175198763417651')
+  .then(channel => console.log(channel.name))
+  .then(channel => channel.send('hi'))
+  .catch(console.error);
+})
+
+
+// const channel = client.channels.get("806175198763417651");
+// message.channel.send("Test").then(sentMessage => sentMessage.edit("Blah"));
+// message.guild.channels.find(channel => channel.name === "channel-name");
+
 
 
 
