@@ -32,7 +32,6 @@ client.on("message", msg => {
 client.on('ready', () => {
 client.channels.fetch('806175198763417651')
   .then(channel => console.log(channel.name))
-  .then(channel => channel.send('hi'))
   .catch(console.error);
 })
 
