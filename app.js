@@ -1,11 +1,13 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
+const schedule = require('node-schedule');
 
-const { port, token, channelId,ngrokPort, channelName } = require("./env.json")
+const { port, token, channelId, channelName } = require("./env.json")
 
 const express = require("express");
 const cors = require("cors");
 const ngrok = require('ngrok');
+
 
 const app = express();
 app.use(cors());
@@ -22,21 +24,33 @@ app.listen(port, async (err) => {
 
     
     try {
-        await ngrok.disconnect(); 
-        await ngrok.kill(); 
         const url = await ngrok.connect(port);
         if(!url) throw new Error("Não foi possível iniciar o NGROK.")
-        return await sendMessageByName(`Ngrok no ar: ${url}`, channelName)        
         
+        await sendMessageByName(`Ngrok no ar: ${url}`, channelName)     
+
+
+        // '0 */1 * * *'
+        const job = schedule.scheduleJob('*/1 * * * * *', async function(){
+            await ngrok.disconnect(); // stops all
+            await ngrok.kill(); // kills ngrok process
+            await sendMessageByName(`Aooo, NGROK atualizado: ${url}`, channelName)   
+
+            console.log('Job executado')
+        });
+
+          
+
+        client.on("message", msg => {
+            if (msg.content === "!ngrok") {
+                msg.reply(`Aooo, ngrok na mão: ${url}`);
+            }
+        });
     } catch (error) {
         await sendMessageByName(`Ocorreu um erro: ${error.message}`, channelName)        
     }
 
-    client.on("message", msg => {
-        if (msg.content === "!ngrok") {
-            msg.reply(`Aooo, ngrok na mão: ${url}`);
-        }
-    });
+  
 
 });
 
