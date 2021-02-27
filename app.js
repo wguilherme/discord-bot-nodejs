@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const { token } = require("./token.json")
+const { token, channelId,ngrokPort } = require("./token.json")
 
 const express = require("express");
 const cors = require("cors");
@@ -8,6 +8,9 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json())
+
+
+console.log(ngrokPort)
 
 
 client.on("ready", async () => {
@@ -76,7 +79,7 @@ client.on('ready', () => {
 
 
 client.on('ready', () => {
-client.channels.fetch('806175198763417651')
+client.channels.fetch(channelId)
   .then(channel => console.log(channel.name))
   .catch(console.error);
 })
@@ -85,10 +88,5 @@ client.channels.fetch('806175198763417651')
 // const channel = client.channels.get("806175198763417651");
 // message.channel.send("Test").then(sentMessage => sentMessage.edit("Blah"));
 // message.guild.channels.find(channel => channel.name === "channel-name");
-
-
-
-
-
 
 client.login(token);
