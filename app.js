@@ -1,26 +1,41 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const { token, channelId,ngrokPort } = require("./token.json")
+const { port, token, channelId,ngrokPort } = require("./token.json")
 
 const express = require("express");
 const cors = require("cors");
+const ngrok = require('ngrok');
 
 const app = express();
 app.use(cors());
 app.use(express.json())
-
-
-console.log(ngrokPort)
-
 
 client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 //    await client.channels.get('806175198763417651').send('Hello here!');
 });
 
-app.listen(3000, ()=>{
-    console.log('App listening on port 3000')
-})
+app.listen(port, async (err) => {
+    if (err) return console.log(`Something bad happened: ${err}`);
+    console.log(`Node.js server listening on ${port}`);
+
+    const url = await ngrok.connect(port);
+
+    try {
+        // await sendMessageByName(message, channelName)        
+        await sendMessageByName(`API Ngrok atualizada, link: ${url}`, 'bot-lab')        
+        
+    } catch (error) {
+        res.status(400).json(error.message)
+    }
+
+    client.on("message", msg => {
+        if (msg.content === "!ngrok") {
+            msg.reply(`Aooo, ngrok na mão: ${url}`);
+        }
+    });
+
+});
 
 
 client.on('ready',  () => {
@@ -30,7 +45,7 @@ client.on('ready',  () => {
         const {channelName} = req.params    
 
         try {
-            await sendMessage(message, channelName)        
+            await sendMessageByName(message, channelName)        
             
         } catch (error) {
             res.status(400).json(error.message)
@@ -39,12 +54,16 @@ client.on('ready',  () => {
     })    
 })
 
-function sendMessage(message, channelName){    
+function sendMessageByName(message, channelName){    
     const channel =  client.channels.cache.find(channel => channel.name === channelName)
-    channel.send(message)
-    
+    channel.send(message)    
     console.log('Message sent')
 }
+
+client.on('ready', () => {
+    channel.send('Lorem ipsum')
+    console.log(channel.name)
+})
 
 // Create an event listener for messages
 client.on('message', message => {
@@ -53,22 +72,17 @@ client.on('message', message => {
       // Send "pong" to the same channel
       message.channel.send('pong');
     }
-  });
+});
 
 // client.on('message', message => {  
 //     message.channel.send('pong');
 //   });
 
-
 client.on("message", msg => {
-
     if (msg.content === "!ping") {
         msg.reply("pong!");
     }
 });
-
-
-
 
 
 client.on('ready', () => {
@@ -77,13 +91,11 @@ client.on('ready', () => {
     console.log(channel.name)
 })
 
-
 client.on('ready', () => {
 client.channels.fetch(channelId)
   .then(channel => console.log(channel.name))
   .catch(console.error);
 })
-
 
 // const channel = client.channels.get("806175198763417651");
 // message.channel.send("Test").then(sentMessage => sentMessage.edit("Blah"));
