@@ -22,10 +22,8 @@ app.listen(port, async (err) => {
 
     
     try {
-
-        await ngrok.disconnect(()=> {
-            console.log('NGROK desconectado')
-        });
+        await ngrok.disconnect(); 
+        await ngrok.kill(); 
         const url = await ngrok.connect(port);
         if(!url) throw new Error("Não foi possível iniciar o NGROK.")
         return await sendMessageByName(`Ngrok no ar: ${url}`, channelName)        
@@ -43,21 +41,21 @@ app.listen(port, async (err) => {
 });
 
 
-client.on('ready',  () => {
-    // Routes
-    app.post('/msg/:channelName', async (req, res) =>{    
-        const {message} = req.body
-        const {channelName} = req.params    
+// client.on('ready',  () => {
+//     // Routes
+//     app.post('/msg/:channelName', async (req, res) =>{    
+//         const {message} = req.body
+//         const {channelName} = req.params    
 
-        try {
-            await sendMessageByName(message, channelName)        
+//         try {
+//             await sendMessageByName(message, channelName)        
             
-        } catch (error) {
-            res.status(400).json(error.message)
-        }
-        res.status(200).json({message: "Message sent successfully"})    
-    })    
-})
+//         } catch (error) {
+//             res.status(400).json(error.message)
+//         }
+//         res.status(200).json({message: "Message sent successfully"})    
+//     })    
+// })
 
 function sendMessageByName(message, channelName){    
     const channel =  client.channels.cache.find(channel => channel.name === channelName)
@@ -90,11 +88,11 @@ client.on("message", msg => {
 });
 
 
-client.on('ready', () => {
-    const channel = client.channels.cache.find(channel => channel.name === 'dev')
-    channel.send('Lorem ipsum')
-    console.log(channel.name)
-})
+// client.on('ready', () => {
+//     const channel = client.channels.cache.find(channel => channel.name === 'dev')
+//     channel.send('Lorem ipsum')
+//     console.log(channel.name)
+// })
 
 client.on('ready', () => {
 client.channels.fetch(channelId)
