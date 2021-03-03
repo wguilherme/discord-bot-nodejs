@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const schedule = require('node-schedule');
 
-const { port, token, channelId, channelName } = require("./env.json")
+const { port, token, channelId, channelName, ngrokPort } = require("./env.json")
 
 const express = require("express");
 const cors = require("cors");
@@ -24,26 +24,28 @@ app.listen(port, async (err) => {
 
     
     try {
-        const url = await ngrok.connect(port);
-        if(!url) throw new Error("Não foi possível iniciar o NGROK.")
-        
-        await sendMessageByName(`Ngrok no ar: ${url}`, channelName)     
 
 
         // '0 */1 * * *'
-        const job = schedule.scheduleJob('*/1 * * * * *', async function(){
-            await ngrok.disconnect(); // stops all
-            await ngrok.kill(); // kills ngrok process
-            await sendMessageByName(`Aooo, NGROK atualizado: ${url}`, channelName)   
+        // const job = schedule.scheduleJob('*/1 * * * * *', async function(){
+        //     await ngrok.disconnect(); // stops all
+        //     await ngrok.kill(); // kills ngrok process
+        //     await sendMessageByName(`Aooo, NGROK atualizado: ${url}`, channelName)   
 
-            console.log('Job executado')
-        });
+        //     console.log('Job executado')
+        // });
 
           
 
-        client.on("message", msg => {
-            if (msg.content === "!ngrok") {
-                msg.reply(`Aooo, ngrok na mão: ${url}`);
+        client.on("message", async (msg) => {
+            if (msg.content === "!ngrokStart") {
+                const url = await startNgrok(ngrokPort)
+                msg.reply(`Aooo, ngrok no ar fi, link: ${url}`);
+
+            }
+            if (msg.content === "!ngrokRestart") {
+                const url = await startNgrok(ngrokPort)
+                msg.reply(`Aooo, ngrok reiniciado! Tá na mão: ${url}`);
             }
         });
     } catch (error) {
@@ -53,6 +55,17 @@ app.listen(port, async (err) => {
   
 
 });
+
+
+async function startNgrok(port){
+
+    await ngrok.disconnect()
+    await ngrok.kill()
+
+    const url = await ngrok.connect(port);
+    if(!url) throw new Error("Não foi possível iniciar o NGROK.")
+    return url
+}
 
 
 // client.on('ready',  () => {
