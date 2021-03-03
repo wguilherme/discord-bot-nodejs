@@ -24,20 +24,15 @@ app.listen(port, async (err) => {
 
     
     try {
-
-
-        // '0 */1 * * *'
-        // const job = schedule.scheduleJob('*/1 * * * * *', async function(){
-        //     await ngrok.disconnect(); // stops all
-        //     await ngrok.kill(); // kills ngrok process
-        //     await sendMessageByName(`Aooo, NGROK atualizado: ${url}`, channelName)   
-
-        //     console.log('Job executado')
-        // });
-
+        // '0 */1 * * *' by hour
+        // '*/1 * * * * *' by second
+        const job = schedule.scheduleJob('0 */1 * * *', async function(){            
+            const url = await startNgrok(ngrokPort)
+            await sendMessageByName(`Aaapa, ngrok atualizado automaticamente. Link: ${url}`, channelName)   
+        });
           
-
         client.on("message", async (msg) => {
+
             if (msg.content === "!ngrokStart") {
                 const url = await startNgrok(ngrokPort)
                 msg.reply(`Aooo, ngrok no ar fi, link: ${url}`);
@@ -51,9 +46,6 @@ app.listen(port, async (err) => {
     } catch (error) {
         await sendMessageByName(`Ocorreu um erro: ${error.message}`, channelName)        
     }
-
-  
-
 });
 
 
@@ -66,8 +58,6 @@ async function startNgrok(port){
     if(!url) throw new Error("Não foi possível iniciar o NGROK.")
     return url
 }
-
-
 // client.on('ready',  () => {
 //     // Routes
 //     app.post('/msg/:channelName', async (req, res) =>{    
@@ -113,7 +103,6 @@ client.on("message", msg => {
         msg.reply("pong!");
     }
 });
-
 
 // client.on('ready', () => {
 //     const channel = client.channels.cache.find(channel => channel.name === 'dev')
