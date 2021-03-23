@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const schedule = require('node-schedule');
 
-const { port, token, channelId, channelName, ngrokPort } = require("./env.json")
+const { port, token, channelId, channelName, ngrokPort, project } = require("./env.json")
 
 const express = require("express");
 const cors = require("cors");
@@ -22,25 +22,29 @@ app.listen(port, async (err) => {
     if (err) return console.log(`Something bad happened: ${err}`);
     console.log(`Node.js server listening on ${port}`);
 
+
+    const url = await startNgrok(ngrokPort)
+    await sendMessageByName(`Ngrok iniciado, projeto: ${project}. Link: ${url}`, channelName)  
+
     
     try {
         // '0 */1 * * *' by hour
         // '*/1 * * * * *' by second
-        const job = schedule.scheduleJob('0 */1 * * *', async function(){            
+        const job = schedule.scheduleJob('0 */2 * * *', async function(){            
             const url = await startNgrok(ngrokPort)
-            await sendMessageByName(`Aaapa, ngrok atualizado automaticamente. Link: ${url}`, channelName)   
+            await sendMessageByName(`Aaapa, ngrok atualizado automaticamente, projeto: ${project}. Link: ${url}`, channelName)   
         });
           
         client.on("message", async (msg) => {
 
             if (msg.content === "!ngrokStart") {
                 const url = await startNgrok(ngrokPort)
-                msg.reply(`Aooo, ngrok no ar fi, link: ${url}`);
+                msg.reply(`Aooo, ngrok no ar fi, projeto: ${project}, link: ${url}`);
 
             }
             if (msg.content === "!ngrokRestart") {
                 const url = await startNgrok(ngrokPort)
-                msg.reply(`Aooo, ngrok reiniciado! Tá na mão: ${url}`);
+                msg.reply(`Aooo, ngrok reiniciado! Projeto: ${project}. Tá na mão: ${url}`);
             }
         });
     } catch (error) {
